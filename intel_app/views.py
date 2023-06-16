@@ -54,6 +54,12 @@ def airtel_tigo(request):
         data = send_bundle_response.json()
 
         print(data)
+        sms_headers = {
+            'Authorization': 'Bearer 1052|j8KzPxKx2czsREkXmiry2UqnT855784gx3EospVW',
+            'Content-Type': 'application/json'
+        }
+
+        sms_url = 'https://webapp.usmsgh.com/api/sms/send'
 
         if send_bundle_response.status_code == 200:
             if data["code"] == "0000":
@@ -66,13 +72,26 @@ def airtel_tigo(request):
                 print("***********")
                 receiver_message = f"Your bundle purchase has been completed successfully. {bundle}MB has been credited to you by {request.user.phone}.\nReference: {payment_reference}\n"
                 sms_message = f"Hello @{request.user.username}. Your bundle purchase has been completed successfully. {bundle}MB has been credited to {phone_number}.\nReference: {payment_reference}\nThank you for using Cleda.\n\nCleda"
-                sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{request.user.phone}&from=Cleda&sms={sms_message}"
-                response = requests.request("GET", url=sms_url)
-                print(response.status_code)
+                
+                receiver_body = {
+                    'recipient': phone_number,
+                    'sender_id': 'Cleda Data',
+                    'message': receiver_message
+                }
+
+                response = requests.request('POST', url=sms_url, params=receiver_body, headers=sms_headers)
                 print(response.text)
-                r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={phone_number}&from=Cleda&sms={receiver_message}"
-                response = requests.request("GET", url=r_sms_url)
+
+                sms_body = {
+                    'recipient': f"0{request.user.phone}",
+                    'sender_id': 'Cleda Data',
+                    'message': sms_message
+                }
+
+                response = requests.request('POST', url=sms_url, params=sms_body, headers=sms_headers)
+
                 print(response.text)
+
                 return JsonResponse({'status': 'Transaction Completed Successfully', 'icon': 'success'})
             else:
                 transaction_to_be_updated = models.IShareBundleTransaction.objects.get(reference=payment_reference)
@@ -80,10 +99,15 @@ def airtel_tigo(request):
                 new_transaction.save()
                 receiver_message = f"Your bundle purchase has been completed successfully. {bundle}MB has been credited to you by {request.user.phone}.\nReference: {payment_reference}\n"
                 sms_message = f"Hello @{request.user.username}. Something went wrong with your transaction. Contact us for enquiries.\nBundle: {bundle}MB\nPhone Number: {phone_number}.\nReference: {payment_reference}\nThank you for using Cleda.\n\nCleda"
-                sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{request.user.phone}&from=Cleda&sms={sms_message}"
-                response = requests.request("GET", url=sms_url)
-                print(response.status_code)
+                
+                sms_body = {
+                    'recipient': f"0{request.user.phone}",
+                    'sender_id': 'Cleda Data',
+                    'message': sms_message
+                }
+                response = requests.request('POST', url=sms_url, params=sms_body, headers=sms_headers)
                 print(response.text)
+
                 # r_sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to={phone_number}&from=Cleda&sms={receiver_message}"
                 # response = requests.request("GET", url=r_sms_url)
                 # print(response.text)
@@ -94,8 +118,17 @@ def airtel_tigo(request):
             new_transaction.save()
             receiver_message = f"Your bundle purchase has been completed successfully. {bundle}MB has been credited to you by {request.user.phone}.\nReference: {payment_reference}\n"
             sms_message = f"Hello @{request.user.username}. Something went wrong with your transaction. Contact us for enquiries.\nBundle: {bundle}MB\nPhone Number: {phone_number}.\nReference: {payment_reference}\nThank you for using Cleda.\n\nCleda"
-            sms_url = f"https://sms.arkesel.com/sms/api?action=send-sms&api_key=UmpEc1JzeFV4cERKTWxUWktqZEs&to=0{request.user.phone}&from=Cleda&sms={sms_message}"
-            response = requests.request("GET", url=sms_url)
+           
+            sms_body = {
+                'recipient': f'0{request.user.phone}',
+                'sender_id': 'Cleda Data',
+                'message': sms_message
+            }
+
+            response = requests.request('POST', url=sms_url, params=sms_body, headers=sms_headers)
+
+            print(response.text)
+
             return JsonResponse({'status': 'Something went wrong', 'icon': 'error'})
     context = {"form": form, "ref": reference, "email": user_email}
     return render(request, "layouts/services/at.html", context=context)
