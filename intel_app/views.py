@@ -83,7 +83,7 @@ def airtel_tigo(request):
                 print(response.text)
 
                 sms_body = {
-                    'recipient': f"0{request.user.phone}",
+                    'recipient': f"233{request.user.phone}",
                     'sender_id': 'Cleda Data',
                     'message': sms_message
                 }
@@ -101,7 +101,7 @@ def airtel_tigo(request):
                 sms_message = f"Hello @{request.user.username}. Something went wrong with your transaction. Contact us for enquiries.\nBundle: {bundle}MB\nPhone Number: {phone_number}.\nReference: {payment_reference}\nThank you for using Cleda.\n\nCleda"
                 
                 sms_body = {
-                    'recipient': f"0{request.user.phone}",
+                    'recipient': f"233{request.user.phone}",
                     'sender_id': 'Cleda Data',
                     'message': sms_message
                 }
@@ -120,7 +120,7 @@ def airtel_tigo(request):
             sms_message = f"Hello @{request.user.username}. Something went wrong with your transaction. Contact us for enquiries.\nBundle: {bundle}MB\nPhone Number: {phone_number}.\nReference: {payment_reference}\nThank you for using Cleda.\n\nCleda"
            
             sms_body = {
-                'recipient': f'0{request.user.phone}',
+                'recipient': f'233{request.user.phone}',
                 'sender_id': 'Cleda Data',
                 'message': sms_message
             }
